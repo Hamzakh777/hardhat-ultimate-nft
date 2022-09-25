@@ -10,8 +10,6 @@ const deployFunction: DeployFunction = async ({ getNamedAccounts, deployments })
     const chainId: number | undefined = network.config.chainId
     if (!chainId) return
 
-    // Price Feed Address, values can be obtained at https://docs.chain.link/docs/reference-contracts
-    // Default one below is ETH/USD contract on Goerli
     const waitBlockConfirmations: number = developmentChains.includes(network.name)
         ? 1
         : VERIFICATION_BLOCK_CONFIRMATIONS
