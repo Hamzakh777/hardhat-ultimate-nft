@@ -2,3 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { BasicNft } from "./BasicNft";
+export type { RandomIpfsNft } from "./RandomIpfsNft";

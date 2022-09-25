@@ -2,3 +2,4 @@
 /* tslint:disable */
 /* eslint-disable */
 export { BasicNft__factory } from "./BasicNft__factory";
+export { RandomIpfsNft__factory } from "./RandomIpfsNft__factory";

@@ -14,6 +14,8 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 // the owner of the contract can withdraw the ETh - paying the artist
 
 error RandomIpfsNft__RangeOutOfBounds();
+error RandomIpfsNft__EthNotEnough();
+error RandomIpfsNft__TransferFailed();
 
 contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage {
   // Type Declaration
@@ -46,24 +48,38 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage {
   // NFT variables
   uint256 private s_tokenCounter;
   string[3] private s_dogTokenUris;
+  uint256 private immutable i_mintFee;
+
+  // Events
+  event NftRequest(
+    uint256 indexed requestId,
+    address requester
+  );
+  event NftMinted(Breed dogBreed, address minter);
 
   constructor(
     uint64 subscriptionId,
     address vrfCoordinatorV2,
     bytes32 keyHash,
     uint32 callbackGasLimit,
-    string[3] memory dogTokenUris
+    string[3] memory dogTokenUris,
+    uint256 mintFee
   ) VRFConsumerBaseV2(vrfCoordinatorV2) ERC721("Random IPFS NFT", "RIN") {
     i_COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinatorV2);
-    i_owner = msg.sender;
+    i_owner = payable(msg.sender);
     i_subscriptionId = subscriptionId;
     i_keyHash = keyHash;
     i_callbackGasLimit = callbackGasLimit;
     s_dogTokenUris = dogTokenUris;
+    i_mintFee = mintFee;
   }
 
   // Assumes the subscription is funded sufficiently.
-  function requestNft() external onlyOwner returns (uint256) {
+  function requestNft() external payable onlyOwner {
+    // we need to pay a fee
+    if (msg.value < i_mintFee) {
+      revert RandomIpfsNft__EthNotEnough();
+    }
     // Will revert if subscription is not set and funded.
     s_requestId = i_COORDINATOR.requestRandomWords(
       i_keyHash,
@@ -74,8 +90,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage {
     );
 
     s_requestIdToSender[s_requestId] = msg.sender;
-
-    return s_requestId;
+    emit NftRequest(s_requestId, msg.sender);
   }
 
   function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
@@ -92,6 +107,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage {
     Breed breed = getBreedFromModdedRng(moddedRng);
     _safeMint(dogOwner, newTokenId);
     _setTokenURI(newTokenId, s_dogTokenUris[uint256(breed)]);
+    emit NftMinted(breed, dogOwner);
   }
 
   function getBreedFromModdedRng(uint256 moddedRng) private pure returns (Breed) {
@@ -109,15 +125,29 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage {
     revert RandomIpfsNft__RangeOutOfBounds();
   }
 
-  // function getTokenURIPerBreed(Breed breed) returns (string memory) {
+  function withdraw() public onlyOwner {
+    (bool success, ) = i_owner.call{value: address(this).balance}("");
+    if (!success) {
+      revert RandomIpfsNft__TransferFailed();
+    }
+  }
 
-  // }
-
+  // getters
   function getChanceArray() private pure returns (uint256[3] memory) {
     return [10, 30, MAX_CHANCE_VALUE];
   }
 
-  function tokenURI(uint256) public pure override returns (string memory) {}
+  function getDogTokenUris(uint256 index) public view returns (string memory) {
+    return s_dogTokenUris[index];
+  }
+
+  // function getTokenURIPerBreed(Breed breed) returns (string memory) {
+
+  // }
+
+  function getTokenCounter() public view returns (uint256) {
+    return s_tokenCounter;
+  }
 
   modifier onlyOwner() {
     require(msg.sender == i_owner);
