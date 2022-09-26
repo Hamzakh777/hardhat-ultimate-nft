@@ -6,11 +6,12 @@ import {
   VERIFICATION_BLOCK_CONFIRMATIONS,
 } from "../helper-hardhat-config"
 import { verify } from "../helper-functions"
-import { VRFCoordinatorV2Interface } from "../typechain"
+import { VRFCoordinatorV2Interface, VRFCoordinatorV2Mock } from "../typechain"
 import { BigNumber } from "ethers"
 import { MetaData, storeImagesInPinata, storeTokenMetadataInPinata } from "../utils/uploadToPinata"
 
 const IMAGES_LOCATION = "./assets/images/randomNft"
+const VRF_SUB_FUND_AMOUNT = ethers.utils.parseEther("30")
 
 const deployFunction: DeployFunction = async ({ getNamedAccounts, deployments, network }) => {
   const { deploy, log } = deployments
@@ -41,13 +42,15 @@ const deployFunction: DeployFunction = async ({ getNamedAccounts, deployments, n
   const { keyHash, callbackGasLimit, mintFee } = networkConfig[chainId]
 
   if (developmentChains.includes(networkName)) {
-    const vrfCoordinatorV2Mock = await ethers.getContract<VRFCoordinatorV2Interface>(
+    const vrfCoordinatorV2Mock = await ethers.getContract<VRFCoordinatorV2Mock>(
       "VRFCoordinatorV2Mock"
     )
     vrfCoordinatorV2Address = vrfCoordinatorV2Mock.address
     const transactionResponse = await vrfCoordinatorV2Mock.createSubscription()
     const transactionReceipt = await transactionResponse.wait(1)
     subscriptionId = transactionReceipt.events && transactionReceipt.events[0].args?.subId
+    // Fund the subscription
+    await vrfCoordinatorV2Mock.fundSubscription(subscriptionId, VRF_SUB_FUND_AMOUNT)
   } else {
     if (networkConfig[chainId].subscriptionId !== undefined) {
       subscriptionId = networkConfig[chainId].subscriptionId as BigNumber
