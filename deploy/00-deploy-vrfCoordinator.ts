@@ -6,7 +6,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   /**
    * @dev Read more at https://docs.chain.link/docs/chainlink-vrf/
    */
-  const BASE_FEE = "100000000000000000"
+  const BASE_FEE = "10000000"
   const GAS_PRICE_LINK = "1000000000" // 0.000000001 LINK per gas
 
   const {

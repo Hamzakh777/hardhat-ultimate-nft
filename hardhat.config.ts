@@ -7,6 +7,7 @@ import "hardhat-deploy"
 import "hardhat-contract-sizer"
 import "@appliedblockchain/chainlink-plugins-fund-link"
 import "./tasks"
+import "solidity-coverage"
 
 dotenv.config()
 
@@ -32,11 +33,11 @@ const config: HardhatUserConfig = {
     hardhat: {
       hardfork: "merge",
       // If you want to do some forking set `enabled` to true
-      forking: {
-        url: MAINNET_RPC_URL,
-        blockNumber: Number(FORKING_BLOCK_NUMBER),
-        enabled: false,
-      },
+      // forking: {
+      //   url: MAINNET_RPC_URL,
+      //   blockNumber: Number(FORKING_BLOCK_NUMBER),
+      //   enabled: false,
+      // },
       chainId: 31337,
     },
     localhost: {

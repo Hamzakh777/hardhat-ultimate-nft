@@ -51,10 +51,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage {
   uint256 private immutable i_mintFee;
 
   // Events
-  event NftRequest(
-    uint256 indexed requestId,
-    address requester
-  );
+  event NftRequest(uint256 indexed requestId, address requester);
   event NftMinted(Breed dogBreed, address minter);
 
   constructor(
@@ -75,7 +72,7 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage {
   }
 
   // Assumes the subscription is funded sufficiently.
-  function requestNft() external payable onlyOwner {
+  function requestNft() external payable {
     // we need to pay a fee
     if (msg.value < i_mintFee) {
       revert RandomIpfsNft__EthNotEnough();
@@ -106,7 +103,6 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage {
     // 12 -> Shiba Inu
     Breed breed = getBreedFromModdedRng(moddedRng);
     s_tokenCounter += s_tokenCounter;
-    _safeMint(dogOwner, newTokenId);
     _setTokenURI(newTokenId, s_dogTokenUris[uint256(breed)]);
     emit NftMinted(breed, dogOwner);
   }
@@ -138,16 +134,20 @@ contract RandomIpfsNft is VRFConsumerBaseV2, ERC721URIStorage {
     return [10, 30, MAX_CHANCE_VALUE];
   }
 
-  function getDogTokenUris(uint256 index) public view returns (string memory) {
-    return s_dogTokenUris[index];
+  function getDogTokenUris() public view returns (string[3] memory) {
+    return s_dogTokenUris;
   }
-
-  // function getTokenURIPerBreed(Breed breed) returns (string memory) {
-
-  // }
 
   function getTokenCounter() public view returns (uint256) {
     return s_tokenCounter;
+  }
+
+  function getMintFee() public view returns (uint256) {
+    return i_mintFee;
+  }
+
+  function getRequestIdToSender(uint256 index) public view returns (address) {
+    return s_requestIdToSender[index];
   }
 
   modifier onlyOwner() {

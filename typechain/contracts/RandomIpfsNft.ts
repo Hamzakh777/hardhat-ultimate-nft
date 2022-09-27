@@ -33,7 +33,9 @@ export interface RandomIpfsNftInterface extends utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
-    "getDogTokenUris(uint256)": FunctionFragment;
+    "getDogTokenUris()": FunctionFragment;
+    "getMintFee()": FunctionFragment;
+    "getRequestIdToSender(uint256)": FunctionFragment;
     "getTokenCounter()": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "name()": FunctionFragment;
@@ -59,6 +61,8 @@ export interface RandomIpfsNftInterface extends utils.Interface {
       | "balanceOf"
       | "getApproved"
       | "getDogTokenUris"
+      | "getMintFee"
+      | "getRequestIdToSender"
       | "getTokenCounter"
       | "isApprovedForAll"
       | "name"
@@ -92,6 +96,14 @@ export interface RandomIpfsNftInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "getDogTokenUris",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getMintFee",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRequestIdToSender",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
@@ -175,6 +187,11 @@ export interface RandomIpfsNftInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getDogTokenUris",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getMintFee", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getRequestIdToSender",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -342,6 +359,12 @@ export interface RandomIpfsNft extends BaseContract {
     ): Promise<[string]>;
 
     getDogTokenUris(
+      overrides?: CallOverrides
+    ): Promise<[[string, string, string]]>;
+
+    getMintFee(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    getRequestIdToSender(
       index: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[string]>;
@@ -444,7 +467,11 @@ export interface RandomIpfsNft extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  getDogTokenUris(
+  getDogTokenUris(overrides?: CallOverrides): Promise<[string, string, string]>;
+
+  getMintFee(overrides?: CallOverrides): Promise<BigNumber>;
+
+  getRequestIdToSender(
     index: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<string>;
@@ -548,6 +575,12 @@ export interface RandomIpfsNft extends BaseContract {
     ): Promise<string>;
 
     getDogTokenUris(
+      overrides?: CallOverrides
+    ): Promise<[string, string, string]>;
+
+    getMintFee(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getRequestIdToSender(
       index: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<string>;
@@ -697,7 +730,11 @@ export interface RandomIpfsNft extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getDogTokenUris(
+    getDogTokenUris(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getMintFee(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getRequestIdToSender(
       index: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -801,7 +838,11 @@ export interface RandomIpfsNft extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getDogTokenUris(
+    getDogTokenUris(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getMintFee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getRequestIdToSender(
       index: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

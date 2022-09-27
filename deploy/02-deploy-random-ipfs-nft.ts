@@ -11,7 +11,7 @@ import { BigNumber } from "ethers"
 import { MetaData, storeImagesInPinata, storeTokenMetadataInPinata } from "../utils/uploadToPinata"
 
 const IMAGES_LOCATION = "./assets/images/randomNft"
-const VRF_SUB_FUND_AMOUNT = ethers.utils.parseEther("30")
+const VRF_SUB_FUND_AMOUNT = ethers.utils.parseEther("3000")
 
 const deployFunction: DeployFunction = async ({ getNamedAccounts, deployments, network }) => {
   const { deploy, log } = deployments
@@ -22,7 +22,11 @@ const deployFunction: DeployFunction = async ({ getNamedAccounts, deployments, n
   if (!chainId) return
 
   // get the IPFS hashes of our images
-  let tokenUris: string[] = []
+  let tokenUris: string[] = [
+    "ipfs://QmNddFsneWThscVTyaTPWoiYAe5X462TSq27Bg2NX6HeWh",
+    "ipfs://QmNqYUNjjRDXU4KN1cLA5pUgJ3V4cEVR7VWwDtCh8Awwue",
+    "ipfs://Qme7UtrSEuizrnR2wjf2wCmh7YradDvsFicn5ozMrxzc6M",
+  ]
   if (process.env.UPLOAD_TO_PANATA === "true") {
     log("Uploading to Pinata")
     tokenUris = await handleTokenUris()
