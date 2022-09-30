@@ -28,7 +28,7 @@ contract DynamicSvgNft is ERC721URIStorage, Ownable {
   mapping(uint256 => int256) public s_tokenIdToHighValue;
 
   // Events
-  event NftRequest(address requester);
+  event NftRequest(uint256 indexed tokenId, address requester);
 
   constructor(
     uint256 mintFee,
@@ -53,7 +53,7 @@ contract DynamicSvgNft is ERC721URIStorage, Ownable {
     _safeMint(msg.sender, newTokenId);
     // _setTokenURI(newTokenId, s_dogTokenUris[uint256(breed)]);
     // emit NftMinted(breed, dogOwner);
-    emit NftRequest(msg.sender);
+    emit NftRequest(newTokenId, msg.sender);
   }
 
   function svgToImageURI(string memory svg) public pure returns (string memory) {
@@ -82,7 +82,7 @@ contract DynamicSvgNft is ERC721URIStorage, Ownable {
     return
       string(
         abi.encodePacked(
-          _baseURI(), 
+          _baseURI(),
           Base64.encode(
             bytes(
               abi.encodePacked(
