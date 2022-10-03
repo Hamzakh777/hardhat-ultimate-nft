@@ -9,7 +9,6 @@ import type {
   CallOverrides,
   ContractTransaction,
   Overrides,
-  PayableOverrides,
   PopulatedTransaction,
   Signer,
   utils,
@@ -33,15 +32,16 @@ export interface DynamicSvgNftInterface extends utils.Interface {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
-    "getMintFee()": FunctionFragment;
+    "getHighSVG()": FunctionFragment;
+    "getLowSVG()": FunctionFragment;
+    "getPriceFeed()": FunctionFragment;
     "getTokenCounter()": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
+    "mintNft(int256)": FunctionFragment;
     "name()": FunctionFragment;
     "owner()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "requestNft(int256)": FunctionFragment;
-    "s_tokenIdToHighValue(uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
@@ -51,7 +51,6 @@ export interface DynamicSvgNftInterface extends utils.Interface {
     "tokenURI(uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
-    "withdraw()": FunctionFragment;
   };
 
   getFunction(
@@ -59,15 +58,16 @@ export interface DynamicSvgNftInterface extends utils.Interface {
       | "approve"
       | "balanceOf"
       | "getApproved"
-      | "getMintFee"
+      | "getHighSVG"
+      | "getLowSVG"
+      | "getPriceFeed"
       | "getTokenCounter"
       | "isApprovedForAll"
+      | "mintNft"
       | "name"
       | "owner"
       | "ownerOf"
       | "renounceOwnership"
-      | "requestNft"
-      | "s_tokenIdToHighValue"
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setApprovalForAll"
@@ -77,7 +77,6 @@ export interface DynamicSvgNftInterface extends utils.Interface {
       | "tokenURI"
       | "transferFrom"
       | "transferOwnership"
-      | "withdraw"
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -93,7 +92,12 @@ export interface DynamicSvgNftInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "getMintFee",
+    functionFragment: "getHighSVG",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "getLowSVG", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getPriceFeed",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -104,6 +108,10 @@ export interface DynamicSvgNftInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     values: [PromiseOrValue<string>, PromiseOrValue<string>]
   ): string;
+  encodeFunctionData(
+    functionFragment: "mintNft",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
@@ -113,14 +121,6 @@ export interface DynamicSvgNftInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "requestNft",
-    values: [PromiseOrValue<BigNumberish>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "s_tokenIdToHighValue",
-    values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom(address,address,uint256)",
@@ -168,7 +168,6 @@ export interface DynamicSvgNftInterface extends utils.Interface {
     functionFragment: "transferOwnership",
     values: [PromiseOrValue<string>]
   ): string;
-  encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -176,7 +175,12 @@ export interface DynamicSvgNftInterface extends utils.Interface {
     functionFragment: "getApproved",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getMintFee", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getHighSVG", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getLowSVG", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getPriceFeed",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getTokenCounter",
     data: BytesLike
@@ -185,16 +189,12 @@ export interface DynamicSvgNftInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "mintNft", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "requestNft", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "s_tokenIdToHighValue",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -227,19 +227,18 @@ export interface DynamicSvgNftInterface extends utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "NftRequest(uint256,address)": EventFragment;
+    "CreatedNFT(uint256,int256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NftRequest"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "CreatedNFT"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
@@ -268,16 +267,16 @@ export type ApprovalForAllEvent = TypedEvent<
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
-export interface NftRequestEventObject {
+export interface CreatedNFTEventObject {
   tokenId: BigNumber;
-  requester: string;
+  highValue: BigNumber;
 }
-export type NftRequestEvent = TypedEvent<
-  [BigNumber, string],
-  NftRequestEventObject
+export type CreatedNFTEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  CreatedNFTEventObject
 >;
 
-export type NftRequestEventFilter = TypedEventFilter<NftRequestEvent>;
+export type CreatedNFTEventFilter = TypedEventFilter<CreatedNFTEvent>;
 
 export interface OwnershipTransferredEventObject {
   previousOwner: string;
@@ -346,7 +345,11 @@ export interface DynamicSvgNft extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    getMintFee(overrides?: CallOverrides): Promise<[BigNumber]>;
+    getHighSVG(overrides?: CallOverrides): Promise<[string]>;
+
+    getLowSVG(overrides?: CallOverrides): Promise<[string]>;
+
+    getPriceFeed(overrides?: CallOverrides): Promise<[string]>;
 
     getTokenCounter(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -355,6 +358,11 @@ export interface DynamicSvgNft extends BaseContract {
       operator: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    mintNft(
+      highValue: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
@@ -368,16 +376,6 @@ export interface DynamicSvgNft extends BaseContract {
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
-
-    requestNft(
-      highValue: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    s_tokenIdToHighValue(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: PromiseOrValue<string>,
@@ -428,10 +426,6 @@ export interface DynamicSvgNft extends BaseContract {
       newOwner: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
-
-    withdraw(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
   };
 
   approve(
@@ -450,7 +444,11 @@ export interface DynamicSvgNft extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  getMintFee(overrides?: CallOverrides): Promise<BigNumber>;
+  getHighSVG(overrides?: CallOverrides): Promise<string>;
+
+  getLowSVG(overrides?: CallOverrides): Promise<string>;
+
+  getPriceFeed(overrides?: CallOverrides): Promise<string>;
 
   getTokenCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -459,6 +457,11 @@ export interface DynamicSvgNft extends BaseContract {
     operator: PromiseOrValue<string>,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  mintNft(
+    highValue: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
@@ -472,16 +475,6 @@ export interface DynamicSvgNft extends BaseContract {
   renounceOwnership(
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
-
-  requestNft(
-    highValue: PromiseOrValue<BigNumberish>,
-    overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  s_tokenIdToHighValue(
-    arg0: PromiseOrValue<BigNumberish>,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   "safeTransferFrom(address,address,uint256)"(
     from: PromiseOrValue<string>,
@@ -533,10 +526,6 @@ export interface DynamicSvgNft extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
-  withdraw(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   callStatic: {
     approve(
       to: PromiseOrValue<string>,
@@ -554,7 +543,11 @@ export interface DynamicSvgNft extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    getMintFee(overrides?: CallOverrides): Promise<BigNumber>;
+    getHighSVG(overrides?: CallOverrides): Promise<string>;
+
+    getLowSVG(overrides?: CallOverrides): Promise<string>;
+
+    getPriceFeed(overrides?: CallOverrides): Promise<string>;
 
     getTokenCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -563,6 +556,11 @@ export interface DynamicSvgNft extends BaseContract {
       operator: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    mintNft(
+      highValue: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -574,16 +572,6 @@ export interface DynamicSvgNft extends BaseContract {
     ): Promise<string>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
-
-    requestNft(
-      highValue: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    s_tokenIdToHighValue(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: PromiseOrValue<string>,
@@ -634,8 +622,6 @@ export interface DynamicSvgNft extends BaseContract {
       newOwner: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    withdraw(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -661,14 +647,14 @@ export interface DynamicSvgNft extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    "NftRequest(uint256,address)"(
+    "CreatedNFT(uint256,int256)"(
       tokenId?: PromiseOrValue<BigNumberish> | null,
-      requester?: null
-    ): NftRequestEventFilter;
-    NftRequest(
+      highValue?: null
+    ): CreatedNFTEventFilter;
+    CreatedNFT(
       tokenId?: PromiseOrValue<BigNumberish> | null,
-      requester?: null
-    ): NftRequestEventFilter;
+      highValue?: null
+    ): CreatedNFTEventFilter;
 
     "OwnershipTransferred(address,address)"(
       previousOwner?: PromiseOrValue<string> | null,
@@ -708,7 +694,11 @@ export interface DynamicSvgNft extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getMintFee(overrides?: CallOverrides): Promise<BigNumber>;
+    getHighSVG(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getLowSVG(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getPriceFeed(overrides?: CallOverrides): Promise<BigNumber>;
 
     getTokenCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -716,6 +706,11 @@ export interface DynamicSvgNft extends BaseContract {
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    mintNft(
+      highValue: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
@@ -729,16 +724,6 @@ export interface DynamicSvgNft extends BaseContract {
 
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    requestNft(
-      highValue: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    s_tokenIdToHighValue(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256)"(
@@ -790,10 +775,6 @@ export interface DynamicSvgNft extends BaseContract {
       newOwner: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
-
-    withdraw(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -813,7 +794,11 @@ export interface DynamicSvgNft extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getMintFee(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    getHighSVG(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getLowSVG(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getPriceFeed(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getTokenCounter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -821,6 +806,11 @@ export interface DynamicSvgNft extends BaseContract {
       owner: PromiseOrValue<string>,
       operator: PromiseOrValue<string>,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    mintNft(
+      highValue: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -834,16 +824,6 @@ export interface DynamicSvgNft extends BaseContract {
 
     renounceOwnership(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    requestNft(
-      highValue: PromiseOrValue<BigNumberish>,
-      overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    s_tokenIdToHighValue(
-      arg0: PromiseOrValue<BigNumberish>,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "safeTransferFrom(address,address,uint256)"(
@@ -893,10 +873,6 @@ export interface DynamicSvgNft extends BaseContract {
 
     transferOwnership(
       newOwner: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    withdraw(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };

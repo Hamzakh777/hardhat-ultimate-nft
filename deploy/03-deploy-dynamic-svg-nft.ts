@@ -13,7 +13,6 @@ const deployDynamicSvgNft: DeployFunction = async function (hre: HardhatRuntimeE
   const { deploy, log } = deployments
   const { deployer } = await getNamedAccounts()
   const chainId = network.config.chainId!
-  const mintFee = networkConfig[chainId].mintFee
   let ethUsdPriceFeedAddress
 
   if (chainId == 31337) {
@@ -30,7 +29,7 @@ const deployDynamicSvgNft: DeployFunction = async function (hre: HardhatRuntimeE
   const highSVG = fs.readFileSync("./assets/images/dynamicNft/happy.svg", { encoding: "utf8" })
 
   log("----------------------------------------------------")
-  const args = [mintFee, lowSVG, highSVG, ethUsdPriceFeedAddress]
+  const args = [ethUsdPriceFeedAddress, lowSVG, highSVG]
   const dynamicSvgNft = await deploy("DynamicSvgNft", {
     from: deployer,
     args: args,
