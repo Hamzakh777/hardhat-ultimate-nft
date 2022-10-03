@@ -6,7 +6,7 @@ import {
   VERIFICATION_BLOCK_CONFIRMATIONS,
 } from "../helper-hardhat-config"
 import { verify } from "../helper-functions"
-import { VRFCoordinatorV2Interface, VRFCoordinatorV2Mock } from "../typechain"
+import { VRFCoordinatorV2Mock } from "../typechain"
 import { BigNumber } from "ethers"
 import { MetaData, storeImagesInPinata, storeTokenMetadataInPinata } from "../utils/uploadToPinata"
 

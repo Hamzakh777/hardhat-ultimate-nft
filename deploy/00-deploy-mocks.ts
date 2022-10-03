@@ -1,13 +1,13 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types"
 import { DeployFunction } from "hardhat-deploy/types"
-import { developmentChains } from "../helper-hardhat-config"
+import { developmentChains, DECIMALS, INITIAL_PRICE } from "../helper-hardhat-config"
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   /**
    * @dev Read more at https://docs.chain.link/docs/chainlink-vrf/
    */
-  const BASE_FEE = "10000000"
-  const GAS_PRICE_LINK = "1000000000" // 0.000000001 LINK per gas
+   const BASE_FEE = "250000000000000000" // 0.25 is this the premium in LINK?
+   const GAS_PRICE_LINK = 1e9 // link per gas, is this the gas lane? // 0.000000001 LINK per gas
 
   const {
     deployments: { deploy, log },
@@ -23,6 +23,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       from: deployer,
       log: true,
       args: [BASE_FEE, GAS_PRICE_LINK],
+    })
+    await deploy("MockV3Aggregator", {
+      from: deployer,
+      log: true,
+      args: [DECIMALS, INITIAL_PRICE],
     })
     log("Mocks deployed!")
     log(`----------------------------------------------------`)

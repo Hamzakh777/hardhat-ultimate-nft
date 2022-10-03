@@ -50,7 +50,7 @@ export const networkConfig: NetworkConfigMap = {
     callbackGasLimit: "1500000",
     mintFee: "100000000000000",
     subscriptionId: BigNumber.from("1"),
-    vrfCoordinator: "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc"
+    vrfCoordinator: "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc",
   },
   5: {
     name: "goerli",
@@ -81,3 +81,5 @@ export const networkConfig: NetworkConfigMap = {
 
 export const developmentChains: string[] = ["hardhat", "localhost"]
 export const VERIFICATION_BLOCK_CONFIRMATIONS = 6
+export const DECIMALS = "18"
+export const INITIAL_PRICE = "200000000000000000000"
